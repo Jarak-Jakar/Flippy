@@ -8,11 +8,6 @@ using namespace cv;
 
 int main()
 {
-	/*Mat identity = Mat::eye(3, 3, CV_32FC1);
-
-	cout << "Identity: " << identity << endl;
-	cin.ignore();*/
-
 	/*
 	Pixel locations of hand-selected feature points in face_001.png (all points specified from face's perspective) (all written as 'x, y')
 	right eye outer corner - 243, 590
