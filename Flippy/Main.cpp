@@ -45,13 +45,33 @@ int main()
 	string firstImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_001.png";
 	Mat firstImage = imread(firstImageLocation);
 
-	Mat descriptorsArray;	
-	Ptr<BRISK> briskComputer = BRISK::create();
-	briskComputer->compute(firstImage, selectedKeypointsVector, descriptorsArray);
+	Mat firstDescriptorsArray, secondDescriptorsArray;	
+	Ptr<FeatureDetector> featureDescriptionComputer = BRISK::create();
+	featureDescriptionComputer->compute(firstImage, selectedKeypointsVector, firstDescriptorsArray);
 
-	string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_001.png";
+	string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_013.png";
 	Mat secondImage = imread(secondImageLocation);
+	vector<KeyPoint> secondImageKeyPointsVector;
+	
+	featureDescriptionComputer->detect(secondImage, secondImageKeyPointsVector);
+	KeyPointsFilter::retainBest(secondImageKeyPointsVector, 72);
+	featureDescriptionComputer->compute(secondImage, secondImageKeyPointsVector, secondDescriptorsArray);
 
+
+	/*drawKeypoints(secondImage, secondImageKeyPointsVector, secondImage);
+	imshow("second image with detected keypoints", secondImage);
+	waitKey(0);*/
+
+	Ptr<DescriptorMatcher> descriptorMatcher = DescriptorMatcher::create("BruteForce");
+	vector<DMatch> matches;
+	descriptorMatcher->match(firstDescriptorsArray, secondDescriptorsArray, matches);
+
+	Mat outputImage;
+
+	drawMatches(firstImage, selectedKeypointsVector, secondImage, secondImageKeyPointsVector, matches, outputImage);
+	imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face1_face13_BRISK_matched.png", outputImage);
+	imshow("output image", outputImage);
+	waitKey(0);
 
 	/*cout << "Descriptors array: " << descriptorsArray << endl;
 
