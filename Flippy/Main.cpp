@@ -40,42 +40,40 @@ int main()
 		firstImagePointsVector.push_back(Point2f(selectedPoints[i]));
 	}
 
-	string firstImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_001.png";
+	string firstImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\BaseImages\\face_001.png";
 	Mat firstImage = imread(firstImageLocation);
 	Mat secondImage;
 	Mat secondImageCopy;
 	vector<uchar> status;
 	vector<float> err;
-	//Mat firstImageGrey;
-	//cvtColor(firstImage, firstImageGrey, CV_BGR2GRAY);
 
 	for (int picNum = 2; picNum < 456; picNum++) {
 
 		stringstream secondImageLocation;
-		secondImageLocation << "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\" << "face_" << setw(3) << setfill('0') << picNum << ".png";
+		secondImageLocation << "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\BaseImages\\" << "face_" << setw(3) << setfill('0') << picNum << ".png";
 
-		//string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_003.png";
 		secondImage = imread(secondImageLocation.str());
-		//Mat secondImageGrey;
-		//cvtColor(secondImage, secondImageGrey, CV_BGR2GRAY);
 		
 		secondImageCopy = secondImage.clone();
 		calcOpticalFlowPyrLK(firstImage, secondImage, firstImagePointsVector, secondImagePointsVector, status, err);
 
-		/*for (auto & i : secondImagePointsVector) {
-			circle(secondImageCopy, i, 3, Scalar(0.0, 255.0, 0.0, 255.0));
-		}*/
+		size_t pointsVectorSize = secondImagePointsVector.size();
 
-		for (size_t i = 0; i != secondImagePointsVector.size(); i++) {
+		for (size_t i = 0; i < pointsVectorSize; i++) {
 			if (status[i] == 1) {
 				circle(secondImageCopy, secondImagePointsVector[i], 3, Scalar(0.0, 255.0, 0.0, 255.0));
+			}
+			else {
+				//cout << "PicNum: " << picNum << ".  Status of " << i << " is " << status[i] << endl;
+				firstImagePointsVector.erase(firstImagePointsVector.begin() + i);
+				secondImagePointsVector.erase(secondImagePointsVector.begin() + i);
+				pointsVectorSize--;
 			}
 		}
 
 		stringstream saveLocation;
-		saveLocation << "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Tracking1\\" << "face_" << setw(3) << setfill('0') << picNum << ".png";
+		saveLocation << "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Tracking2\\" << "face_" << setw(3) << setfill('0') << picNum << ".png";
 
-		//imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face_003.png", secondImageCopy);
 		imwrite(saveLocation.str(), secondImageCopy);
 
 		secondImagePointsVector.swap(firstImagePointsVector);
@@ -84,6 +82,8 @@ int main()
 
 	//imshow("Optical flow test", secondImageCopy);
 	//waitKey(0);
+
+	//cin.ignore();
 
 	return EXIT_SUCCESS;
 }
