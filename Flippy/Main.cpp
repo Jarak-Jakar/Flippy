@@ -44,18 +44,24 @@ int main()
 
 	string firstImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_001.png";
 	Mat firstImage = imread(firstImageLocation);
+	Mat firstImageGrey;
+	cvtColor(firstImage, firstImageGrey, CV_BGR2GRAY);
 
 	Mat firstDescriptorsArray, secondDescriptorsArray;	
-	Ptr<FeatureDetector> featureDescriptionComputer = BRISK::create();
-	featureDescriptionComputer->compute(firstImage, selectedKeypointsVector, firstDescriptorsArray);
+	Ptr<FeatureDetector> featureDescriptionComputer = ORB::create();
+	//featureDescriptionComputer->detect(firstImage, selectedKeypointsVector);
+	//KeyPointsFilter::retainBest(selectedKeypointsVector, 72);
+	featureDescriptionComputer->compute(firstImageGrey, selectedKeypointsVector, firstDescriptorsArray);
 
-	string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_013.png";
+	string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_002.png";
 	Mat secondImage = imread(secondImageLocation);
+	Mat secondImageGrey;
+	cvtColor(secondImage, secondImageGrey, CV_BGR2GRAY);
 	vector<KeyPoint> secondImageKeyPointsVector;
 	
-	featureDescriptionComputer->detect(secondImage, secondImageKeyPointsVector);
-	KeyPointsFilter::retainBest(secondImageKeyPointsVector, 72);
-	featureDescriptionComputer->compute(secondImage, secondImageKeyPointsVector, secondDescriptorsArray);
+	featureDescriptionComputer->detect(secondImageGrey, secondImageKeyPointsVector);
+	//KeyPointsFilter::retainBest(secondImageKeyPointsVector, 72);
+	featureDescriptionComputer->compute(secondImageGrey, secondImageKeyPointsVector, secondDescriptorsArray);
 
 
 	/*drawKeypoints(secondImage, secondImageKeyPointsVector, secondImage);
@@ -68,8 +74,8 @@ int main()
 
 	Mat outputImage;
 
-	drawMatches(firstImage, selectedKeypointsVector, secondImage, secondImageKeyPointsVector, matches, outputImage);
-	imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face1_face13_BRISK_matched.png", outputImage);
+	drawMatches(firstImageGrey, selectedKeypointsVector, secondImageGrey, secondImageKeyPointsVector, matches, outputImage);
+	imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face1_face2_GREY_ORB_matched.png", outputImage);
 	imshow("output image", outputImage);
 	waitKey(0);
 
