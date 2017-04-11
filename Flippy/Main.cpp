@@ -33,55 +33,48 @@ int main()
 		Point(400, 545), Point(490, 549), Point(296, 772), Point(421, 768), Point(322, 704), Point(376, 697)
 	};
 
-	vector<Point2f> selectedPointsVector;
+	vector<Point2f> firstImagePointsVector, secondImagePointsVector;
 
 	for (int i = 0; i < 12; i++) {
-		selectedPointsVector.push_back(Point2f(selectedPoints[i]));
+		firstImagePointsVector.push_back(Point2f(selectedPoints[i]));
 	}
-
-	vector<KeyPoint> selectedKeypointsVector;
-	KeyPoint::convert(selectedPointsVector, selectedKeypointsVector);
 
 	string firstImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_001.png";
 	Mat firstImage = imread(firstImageLocation);
-	Mat firstImageGrey;
-	cvtColor(firstImage, firstImageGrey, CV_BGR2GRAY);
+	//Mat firstImageGrey;
+	//cvtColor(firstImage, firstImageGrey, CV_BGR2GRAY);
 
-	Mat firstDescriptorsArray, secondDescriptorsArray;	
-	Ptr<FeatureDetector> featureDescriptionComputer = ORB::create();
-	//featureDescriptionComputer->detect(firstImage, selectedKeypointsVector);
-	//KeyPointsFilter::retainBest(selectedKeypointsVector, 72);
-	featureDescriptionComputer->compute(firstImageGrey, selectedKeypointsVector, firstDescriptorsArray);
+	for (int picNum = 2; picNum < 3; picNum++) {
 
-	string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_002.png";
-	Mat secondImage = imread(secondImageLocation);
-	Mat secondImageGrey;
-	cvtColor(secondImage, secondImageGrey, CV_BGR2GRAY);
-	vector<KeyPoint> secondImageKeyPointsVector;
-	
-	featureDescriptionComputer->detect(secondImageGrey, secondImageKeyPointsVector);
-	//KeyPointsFilter::retainBest(secondImageKeyPointsVector, 72);
-	featureDescriptionComputer->compute(secondImageGrey, secondImageKeyPointsVector, secondDescriptorsArray);
+		string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_003.png";
+		Mat secondImage = imread(secondImageLocation);
+		//Mat secondImageGrey;
+		//cvtColor(secondImage, secondImageGrey, CV_BGR2GRAY);
+		vector<uchar> status;
+		vector<float> err;
+		Mat secondImageCopy;
+		secondImageCopy = secondImage.clone();
 
+		calcOpticalFlowPyrLK(firstImage, secondImage, firstImagePointsVector, secondImagePointsVector, status, err);
 
-	/*drawKeypoints(secondImage, secondImageKeyPointsVector, secondImage);
-	imshow("second image with detected keypoints", secondImage);
-	waitKey(0);*/
+		/*for (auto & i : secondImagePointsVector) {
+			circle(secondImageCopy, i, 3, Scalar(0.0, 255.0, 0.0, 255.0));
+		}*/
 
-	Ptr<DescriptorMatcher> descriptorMatcher = DescriptorMatcher::create("BruteForce");
-	vector<DMatch> matches;
-	descriptorMatcher->match(firstDescriptorsArray, secondDescriptorsArray, matches);
+		for (size_t i = 0; i != secondImagePointsVector.size(); i++) {
+			if (status[i] == 1) {
+				circle(secondImageCopy, secondImagePointsVector[i], 3, Scalar(0.0, 255.0, 0.0, 255.0));
+			}
+		}
 
-	Mat outputImage;
+		imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face_003.png", secondImageCopy);
 
-	drawMatches(firstImageGrey, selectedKeypointsVector, secondImageGrey, secondImageKeyPointsVector, matches, outputImage);
-	imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face1_face2_GREY_ORB_matched.png", outputImage);
-	imshow("output image", outputImage);
-	waitKey(0);
+		secondImagePointsVector.swap(firstImagePointsVector);
+		secondImage.copyTo(firstImage);
+	}
 
-	/*cout << "Descriptors array: " << descriptorsArray << endl;
-
-	cin.ignore();*/
+	//imshow("Optical flow test", secondImageCopy);
+	//waitKey(0);
 
 	return EXIT_SUCCESS;
 }
