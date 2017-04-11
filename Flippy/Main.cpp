@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
 #include <opencv2\opencv.hpp>
@@ -41,20 +42,24 @@ int main()
 
 	string firstImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_001.png";
 	Mat firstImage = imread(firstImageLocation);
+	Mat secondImage;
+	Mat secondImageCopy;
+	vector<uchar> status;
+	vector<float> err;
 	//Mat firstImageGrey;
 	//cvtColor(firstImage, firstImageGrey, CV_BGR2GRAY);
 
-	for (int picNum = 2; picNum < 3; picNum++) {
+	for (int picNum = 2; picNum < 456; picNum++) {
 
-		string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_003.png";
-		Mat secondImage = imread(secondImageLocation);
+		stringstream secondImageLocation;
+		secondImageLocation << "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\" << "face_" << setw(3) << setfill('0') << picNum << ".png";
+
+		//string secondImageLocation = "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\face_003.png";
+		secondImage = imread(secondImageLocation.str());
 		//Mat secondImageGrey;
 		//cvtColor(secondImage, secondImageGrey, CV_BGR2GRAY);
-		vector<uchar> status;
-		vector<float> err;
-		Mat secondImageCopy;
+		
 		secondImageCopy = secondImage.clone();
-
 		calcOpticalFlowPyrLK(firstImage, secondImage, firstImagePointsVector, secondImagePointsVector, status, err);
 
 		/*for (auto & i : secondImagePointsVector) {
@@ -67,7 +72,11 @@ int main()
 			}
 		}
 
-		imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face_003.png", secondImageCopy);
+		stringstream saveLocation;
+		saveLocation << "C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Tracking1\\" << "face_" << setw(3) << setfill('0') << picNum << ".png";
+
+		//imwrite("C:\\Misc\\James\\UoA Contract\\Flippy\\Images\\Matched\\face_003.png", secondImageCopy);
+		imwrite(saveLocation.str(), secondImageCopy);
 
 		secondImagePointsVector.swap(firstImagePointsVector);
 		secondImage.copyTo(firstImage);
